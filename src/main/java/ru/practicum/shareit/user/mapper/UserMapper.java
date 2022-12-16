@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class UserMapper {
 
@@ -21,5 +24,11 @@ public class UserMapper {
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
+    }
+
+    public List<UserDto> toListOfUserDto(List<User> users) {
+        return users.stream()
+                .map(this::toUserDto)
+                .collect(Collectors.toList());
     }
 }

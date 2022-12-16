@@ -2,17 +2,18 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.valid.Marker;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Validated
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,9 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(userMapper::toUserDto)
-                .collect(Collectors.toList());
+        return userMapper.toListOfUserDto(userRepository.findAll());
     }
 
     @Override
@@ -45,19 +44,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public @Valid UserDto update(long id, UserDto userDto) {
-        UserDto oldUser = getById(id);
+    public @Validated(Marker.OnCreate.class) UserDto update(long id, UserDto userDto) {
+        User user = userRepository.findById(id).get();
 
-        throwIfEmailDuplicate(userDto);
-
-        if (userDto.getEmail() == null) {
-            userDto.setEmail(oldUser.getEmail());
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank() && !user.getEmail().equals(userDto.getEmail())) {
+            throwIfEmailDuplicate(userDto);
+            user.setEmail(userDto.getEmail());
         }
-        if (userDto.getName() == null) {
-            userDto.setName(oldUser.getName());
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
         }
-
-        User user = userRepository.update(id, userMapper.toUser(userDto));
 
         return userMapper.toUserDto(user);
     }

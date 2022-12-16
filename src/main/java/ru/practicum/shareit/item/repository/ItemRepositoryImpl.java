@@ -13,6 +13,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     private int lastId = 0;
     private Map<Long, List<Item>> items = new HashMap<>();
+    private Map<Long, Item> storage = new LinkedHashMap<>();
 
     @Override
     public Item save(long userId, Item item) {
@@ -26,6 +27,7 @@ public class ItemRepositoryImpl implements ItemRepository {
             list.add(item);
             return list;
         });
+        storage.put(item.getId(), item);
 
         return item;
     }
@@ -43,21 +45,18 @@ public class ItemRepositoryImpl implements ItemRepository {
         items.get(userId).removeIf(i -> i.getId() == itemId);
         items.get(userId).add(item);
 
+        storage.put(itemId, item);
         return item;
     }
 
     @Override
     public Optional<Item> findById(long itemId) {
-        return items.values().stream()
-                .flatMap(List::stream)
-                .filter(item -> item.getId() == itemId)
-                .findFirst();
+        return Optional.ofNullable(storage.get(itemId));
     }
 
     @Override
     public List<Item> search(String text) {
-        return items.values().stream()
-                .flatMap(List::stream)
+        return storage.values().stream()
                 .filter(item -> {
                     if (item.getAvailable().equals(true)) {
                         return item.getName().toLowerCase().contains(text.toLowerCase())

@@ -4,49 +4,44 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
     private int lastId = 0;
-    private List<User> users = new ArrayList<>();
+    private Map<Long, User> users = new HashMap<>();
 
     @Override
     public User save(User user) {
         user.setId(getId());
-        users.add(user);
+        users.put(user.getId(), user);
         return user;
     }
 
     @Override
     public Optional<User> findById(long id) {
-        return users.stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
     @Override
     public User update(long id, User user) {
         user.setId(id);
 
-        users.removeIf(u -> u.getId() == id);
-        users.add(user);
+        users.put(id, user);
 
         return user;
     }
 
     @Override
     public void delete(long id) {
-        users.removeIf(user -> user.getId() == id);
+        users.remove(id);
     }
 
     private long getId() {

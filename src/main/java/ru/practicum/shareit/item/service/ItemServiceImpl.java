@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -11,10 +12,9 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Validated
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
@@ -33,33 +33,26 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAllUserItems(long userId) {
         userService.getById(userId);
-        return itemRepository.findAllUserItems(userId).stream()
-                .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemMapper.toListOfItemDto(itemRepository.findAllUserItems(userId));
     }
 
     @Override
     public @Valid ItemDto update(long itemId, long userId, ItemDto itemDto) {
-        ItemDto oldItemDto = getById(itemId, userId);
+        Item item = itemRepository.findById(itemId).get();
 
-        if (itemDto.getName() == null) {
-            itemDto.setName(oldItemDto.getName());
+        if (item.getOwner() != userId) {
+            throw new NotFoundException(String.format("item with id: %d " +
+                    "does not belong to the user with id: %d", itemId, userId));
         }
-        if (itemDto.getDescription() == null) {
-            itemDto.setDescription(oldItemDto.getDescription());
+        if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
+            item.setName(itemDto.getName());
         }
-        if (itemDto.getAvailable() == null) {
-            itemDto.setAvailable(oldItemDto.getAvailable());
+        if (itemDto.getDescription() != null && !itemDto.getDescription().isBlank()) {
+            item.setDescription(itemDto.getDescription());
         }
-
-        itemRepository.findAllUserItems(userId).stream()
-                .map(item -> item.getId())
-                .filter(id -> id == itemId)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("item with id: %d " +
-                        "does not belong to the user with id: %d", itemId, userId)));
-
-        Item item = itemRepository.update(itemId, userId, itemMapper.toItem(itemDto));
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
+        }
 
         return itemMapper.toItemDto(item);
     }
@@ -78,12 +71,6 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(long userId, String text) {
         userService.getById(userId);
 
-        if (text == null || text.isBlank()) {
-            return Collections.emptyList();
-        }
-
-        return itemRepository.search(text).stream()
-                .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemMapper.toListOfItemDto(itemRepository.search(text));
     }
 }
