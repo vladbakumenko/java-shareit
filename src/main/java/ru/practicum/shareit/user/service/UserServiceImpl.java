@@ -45,7 +45,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public @Validated(Marker.OnCreate.class) UserDto update(long id, UserDto userDto) {
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("user with id: %d does not exist yet", id)));
 
         if (userDto.getEmail() != null && !userDto.getEmail().isBlank() && !user.getEmail().equals(userDto.getEmail())) {
             throwIfEmailDuplicate(userDto);
