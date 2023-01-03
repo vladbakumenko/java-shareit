@@ -69,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("item with id: %d not found", itemId)));
 
-        if (item.getOwner() != userId) {
+        if (!userId.equals(item.getOwner())) {
             throw new NotFoundException(String.format("item with id: %d " +
                     "does not belong to the user with id: %d", itemId, userId));
         }
@@ -99,7 +99,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> list = List.of(item);
         ItemDtoWithBookingsAndComments itemDtoWithBookingsAndComments = addBookingsAndCommentsForItems(list).get(0);
 
-        if (item.getOwner() != userId) {
+        if (!userId.equals(item.getOwner())) {
             itemDtoWithBookingsAndComments.setLastBooking(null);
             itemDtoWithBookingsAndComments.setNextBooking(null);
         }
@@ -123,13 +123,13 @@ public class ItemServiceImpl implements ItemService {
         }
         if (pastBookings.stream()
                 .map(b -> b.getBooker().getId())
-                .noneMatch(id -> id == userId)) {
+                .noneMatch(id -> id.equals(userId))) {
             throw new BadRequestException(String.format("Booker with id: %d did not take the item with id: %d" +
                     " or the booking term has not yet expired", userId, itemId));
         }
         Item item = pastBookings.stream()
-                .map(b -> b.getItem())
-                .filter(i -> i.getId() == itemId)
+                .map(Booking::getItem)
+                .filter(i -> i.getId().equals(itemId))
                 .findFirst()
                 .orElseThrow();
 
@@ -153,13 +153,11 @@ public class ItemServiceImpl implements ItemService {
         List<BookingDtoForItem> bookings = bookingRepository.findAllByItemsId(itemsId).stream()
                 .map(BookingMapper::toBookingDtoForItem)
                 .collect(Collectors.toList());
-//        if (bookings.isEmpty()) {
-//            return itemMapper.toListOfItemDtoWithBookingAndComments(items);
-//        }
 
         List<Comment> comments = commentRepository.findAllByItemsId(itemsId);
 
-        Set<ItemDtoWithBookingsAndComments> itemsWithBookings = new TreeSet<>((i1, i2) -> i1.getId().compareTo(i2.getId()));
+        Set<ItemDtoWithBookingsAndComments> itemsWithBookings =
+                new TreeSet<>(Comparator.comparing(ItemDtoWithBookingsAndComments::getId));
         for (Item item : items) {
             ItemDtoWithBookingsAndComments itemDtoWithBookings = itemMapper.toItemDtoWithBooking(item);
             Set<BookingDtoForItem> nextBookings = new TreeSet<>(Comparator.comparing(BookingDtoForItem::getStart));
@@ -167,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
                     .reversed());
             for (BookingDtoForItem booking : bookings) {
                 LocalDateTime now = LocalDateTime.now();
-                if (item.getId() == booking.getItem().getId()) {
+                if (item.getId().equals(booking.getItem().getId())) {
                     if (booking.getStart().isAfter(now)) {
                         nextBookings.add(booking);
                     } else {
@@ -186,13 +184,13 @@ public class ItemServiceImpl implements ItemService {
 
             itemDtoWithBookings.setComments(new ArrayList<>());
             for (Comment comment : comments) {
-                if (comment.getItem().getId() == item.getId()) {
+                if (comment.getItem().getId().equals(item.getId())) {
                     CommentDto commentDto = commentMapper.toCommentDto(comment);
                     commentDto.setAuthorName(userService.getById(comment.getAuthor()).getName());
                     itemDtoWithBookings.getComments().add(commentDto);
                 }
             }
         }
-        return itemsWithBookings.stream().collect(Collectors.toList());
+        return new ArrayList<>(itemsWithBookings);
     }
 }

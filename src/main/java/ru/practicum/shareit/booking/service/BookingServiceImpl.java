@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new BadRequestException(String.format("item with id: %d is currently unavailable", item.getId()));
         }
-        if (item.getOwner() == userId) {
+        if (item.getOwner().equals(userId)) {
             throw new NotFoundException("the owner cannot book his own item");
         }
 
@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("booking with id: %d does not found", bookingId)));
 
-        if (booking.getItem().getOwner() != userId) {
+        if (!booking.getItem().getOwner().equals(userId)) {
             throw new NotFoundException(String.format("this item is not owned by the user with id: %d", userId));
         }
         if (booking.getStatus().equals(Status.APPROVED) && approved) {
@@ -79,9 +79,9 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("booking with id: %d does not found", bookingId)));
 
-        if (booking.getBooker().getId() != userId && booking.getItem().getOwner() != userId) {
-            throw new NotFoundException(String.format("the booking cannot be viewed by a non-owner of the item" +
-                    " or a non-creator of the booking"));
+        if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().equals(userId)) {
+            throw new NotFoundException("the booking cannot be viewed by a non-owner of the item" +
+                    " or a non-creator of the booking");
         }
 
         return bookingMapper.toBookingDto(booking);
