@@ -2,9 +2,7 @@ package ru.practicum.shareit.booking.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -12,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class BookingDto {
+public class BookingDtoForItem {
     @Positive
     private Long id;
     @NotNull
@@ -20,9 +18,7 @@ public class BookingDto {
     @NotNull
     private LocalDateTime end;
     @NotNull
-    private ItemDto item;
-    @NotNull
-    private UserDto booker;
-    @NotNull
-    private Status status;
+    private Item item;
+    @Positive
+    private Long bookerId;
 }

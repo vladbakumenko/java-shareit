@@ -23,13 +23,13 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable long id,
+    public UserDto update(@PathVariable Long id,
                           @RequestBody @Validated(Marker.OnUpdate.class) UserDto userDto) {
         return userService.update(id, userDto);
     }
 
     @GetMapping("/{id}")
-    public UserDto getById(@PathVariable long id) {
+    public UserDto getById(@PathVariable Long id) {
         return userService.getById(id);
     }
 
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable Long id) {
         userService.delete(id);
     }
 }

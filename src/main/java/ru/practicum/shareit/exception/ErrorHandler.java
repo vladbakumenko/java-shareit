@@ -15,11 +15,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class,
+            ConstraintViolationException.class,
+            BadRequestException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> validExceptionHandler(Exception e) {
         log.error(e.getMessage());
-        return Map.of("error", "one of the fields is entered incorrectly");
+        return Map.of("error", e.getMessage());
     }
 
     @ExceptionHandler

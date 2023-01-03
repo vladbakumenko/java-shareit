@@ -8,11 +8,11 @@ public interface UserService {
 
     List<UserDto> getAllUsers();
 
-    UserDto getById(long id);
+    UserDto getById(Long id);
 
     UserDto save(UserDto userDto);
 
-    UserDto update(long id, UserDto userDto);
+    UserDto update(Long id, UserDto userDto);
 
-    void delete(long id);
+    void delete(Long id);
 }
