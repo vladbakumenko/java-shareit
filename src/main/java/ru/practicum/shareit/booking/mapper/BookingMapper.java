@@ -48,12 +48,12 @@ public class BookingMapper {
                 .collect(Collectors.toList());
     }
 
-    public static BookingDtoForItem toBookingDtoForItem(Booking booking) {
+    public BookingDtoForItem toBookingDtoForItem(Booking booking) {
         return BookingDtoForItem.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
-                .item(booking.getItem())
+                .item(new BookingDtoForItem.Item(booking.getItem().getId(), booking.getItem().getName()))
                 .bookerId(booking.getBooker().getId())
                 .build();
     }

@@ -11,7 +11,6 @@ public class CommentMapper {
     public Comment toComment(CommentCreationDto commentCreationDto) {
         return Comment.builder()
                 .text(commentCreationDto.getText())
-                .created(commentCreationDto.getCreated())
                 .build();
     }
 

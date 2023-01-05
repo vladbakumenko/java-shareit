@@ -20,9 +20,7 @@ public class ItemDtoWithBookingsAndComments {
     @BooleanFlag
     @NotNull(message = "available field cannot be empty")
     private Boolean available;
-    @NotNull
     private BookingDtoForItem lastBooking;
-    @NotNull
     private BookingDtoForItem nextBooking;
     private List<CommentDto> comments;
 }

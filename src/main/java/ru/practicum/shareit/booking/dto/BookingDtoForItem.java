@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import ru.practicum.shareit.item.model.Item;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -21,4 +19,13 @@ public class BookingDtoForItem {
     private Item item;
     @Positive
     private Long bookerId;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Item {
+        private Long id;
+        private String name;
+    }
 }
