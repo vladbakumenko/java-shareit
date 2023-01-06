@@ -43,20 +43,18 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getAllByBooker(@RequestParam(defaultValue = "ALL") String state,
                                            @RequestHeader("X-Sharer-User-Id") long userId) {
-        throwIfStateNotValid(state);
-        return bookingService.getAllByBooker(state, userId);
+        return bookingService.getAllByBooker(throwIfStateNotValid(state), userId);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllByOwner(@RequestParam(defaultValue = "ALL") String state,
                                           @RequestHeader("X-Sharer-User-Id") long userId) {
-        throwIfStateNotValid(state);
-        return bookingService.getAllByOwner(state, userId);
+        return bookingService.getAllByOwner(throwIfStateNotValid(state), userId);
     }
 
-    private void throwIfStateNotValid(String state) {
+    private State throwIfStateNotValid(String state) {
         try {
-            State.valueOf(state);
+            return State.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Unknown state: " + state);
         }

@@ -23,6 +23,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
@@ -44,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentMapper commentMapper;
     private final CommentRepository commentRepository;
     private final BookingMapper bookingMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -88,8 +90,6 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-
-        itemRepository.save(item);
 
         return itemMapper.toItemDto(item);
     }
@@ -143,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
 
         Comment comment = commentMapper.toComment(commentCreationDto);
         comment.setItem(item);
-        comment.setAuthor(userDto.getId());
+        comment.setAuthor(userMapper.toUser(userDto));
         comment.setCreated(Instant.now());
 
         commentRepository.save(comment);
@@ -194,7 +194,7 @@ public class ItemServiceImpl implements ItemService {
             for (Comment comment : comments) {
                 if (comment.getItem().getId().equals(item.getId())) {
                     CommentDto commentDto = commentMapper.toCommentDto(comment);
-                    commentDto.setAuthorName(userService.getById(comment.getAuthor()).getName());
+                    commentDto.setAuthorName(comment.getAuthor().getName());
                     itemDtoWithBookings.getComments().add(commentDto);
                 }
             }

@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -91,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByBooker(String state, long userId) {
+    public List<BookingDto> getAllByBooker(State state, long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(String.format("user with id: %d does not exist yet", userId));
         }
@@ -99,28 +100,28 @@ public class BookingServiceImpl implements BookingService {
         List<BookingDto> result = Collections.emptyList();
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 result = bookingMapper.toListOfBookingDto(bookingRepository.findAllByBookerId(userId,
                         Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "CURRENT":
+            case CURRENT:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByBookerIdAndCurrentState(userId, Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "PAST":
+            case PAST:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByBookerIdAndPastState(userId, Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "FUTURE":
+            case FUTURE:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByBookerIdAndFutureState(userId, Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "WAITING":
+            case WAITING:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByBookerIdAndWaitingOrRejectedState(userId, Status.WAITING,
                                 Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "REJECTED":
+            case REJECTED:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByBookerIdAndWaitingOrRejectedState(userId, Status.REJECTED,
                                 Sort.by(Sort.Direction.DESC, "end")));
@@ -130,7 +131,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByOwner(String state, long userId) {
+    public List<BookingDto> getAllByOwner(State state, long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(String.format("user with id: %d does not exist yet", userId));
         }
@@ -138,31 +139,31 @@ public class BookingServiceImpl implements BookingService {
         List<BookingDto> result = Collections.emptyList();
 
         switch (state) {
-            case "ALL":
+            case ALL:
                 result = bookingMapper.toListOfBookingDto(bookingRepository.findAllByOwnerId(userId,
                         Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "CURRENT":
+            case CURRENT:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByOwnerIdAndCurrentState(userId,
                                 Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "PAST":
+            case PAST:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByOwnerIdAndPastState(userId,
                                 Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "FUTURE":
+            case FUTURE:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByOwnerIdAndFutureState(userId,
                                 Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "WAITING":
+            case WAITING:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByOwnerIdAndWaitingOrRejectedState(userId, Status.WAITING,
                                 Sort.by(Sort.Direction.DESC, "end")));
                 break;
-            case "REJECTED":
+            case REJECTED:
                 result = bookingMapper.toListOfBookingDto(bookingRepository
                         .findAllByOwnerIdAndWaitingOrRejectedState(userId, Status.REJECTED,
                                 Sort.by(Sort.Direction.DESC, "end")));
