@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.mapper;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.request.dto.ItemRequestCreationDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;

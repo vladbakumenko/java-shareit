@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -432,7 +433,7 @@ class BookingServiceImplTest {
         long userId = 1L;
         Integer from = 1;
         Integer size = 3;
-        Pageable pageable = PageRequest.of(from/size, size);
+        Pageable pageable = PageRequest.of(from / size, size);
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerId(userId, pageable)).thenReturn(Page.empty());
@@ -560,7 +561,7 @@ class BookingServiceImplTest {
         long userId = 1L;
         Integer from = 1;
         Integer size = 3;
-        Pageable pageable = PageRequest.of(from/size, size);
+        Pageable pageable = PageRequest.of(from / size, size);
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByOwnerId(userId, pageable)).thenReturn(Page.empty());
