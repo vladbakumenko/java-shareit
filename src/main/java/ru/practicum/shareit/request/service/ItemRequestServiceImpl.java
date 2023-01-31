@@ -23,6 +23,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Validated
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -91,18 +93,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private List<ItemRequestDto> addItemsToRequests(List<ItemRequestDto> result) {
         List<Long> requestsId = result.stream()
                 .map(ItemRequestDto::getId)
-                .collect(Collectors.toList());
+                .collect(toList());
 
-        List<ItemDto> items = itemMapper.toListOfItemDto(itemRepository
-                .findAllByRequestIn(requestsId));
-
-        Map<Long, List<ItemDto>> map = new HashMap<>();
-
-        for (ItemDto itemDto : items) {
-            List<ItemDto> list = map.getOrDefault(itemDto.getRequestId(), new ArrayList<>());
-            list.add(itemDto);
-            map.put(itemDto.getRequestId(), list);
-        }
+        Map<Long, List<ItemDto>> map = itemRepository
+                .findAllByRequestIn(requestsId).stream()
+                .map(itemMapper::toItemDto)
+                .collect(Collectors.groupingBy(ItemDto::getRequestId, toList()));
 
         for (ItemRequestDto itemRequestDto : result) {
             itemRequestDto.setItems(map.getOrDefault(itemRequestDto.getId(), Collections.emptyList()));
