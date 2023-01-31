@@ -152,7 +152,7 @@ class BookingControllerIT {
 
         List<BookingDto> list = List.of(BookingDto.builder().build());
 
-        when(bookingService.getAllByBooker(State.ALL, userId, null, null))
+        when(bookingService.getAllByBooker(State.ALL, userId, 0, 10))
                 .thenReturn(list);
 
         String result = mockMvc.perform(get("/bookings")

@@ -67,12 +67,9 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> items;
 
-        if (from == null && size == null) {
-            items = itemRepository.findAllByOwner(userId, Pageable.unpaged()).getContent();
-        } else {
-            Pageable pageable = PageRequest.of(from / size, size);
-            items = itemRepository.findAllByOwner(userId, pageable).getContent();
-        }
+        Pageable pageable = PageRequest.of(from / size, size);
+        items = itemRepository.findAllByOwner(userId, pageable).getContent();
+
 
         return addBookingsAndCommentsForItems(items);
     }
@@ -124,12 +121,8 @@ public class ItemServiceImpl implements ItemService {
         userService.getById(userId);
         List<Item> items;
 
-        if (from == null && size == null) {
-            items = itemRepository.search(text.toLowerCase(), Pageable.unpaged()).getContent();
-        } else {
-            Pageable pageable = PageRequest.of(from / size, size);
-            items = itemRepository.search(text.toLowerCase(), pageable).getContent();
-        }
+        Pageable pageable = PageRequest.of(from / size, size);
+        items = itemRepository.search(text.toLowerCase(), pageable).getContent();
 
         return itemMapper.toListOfItemDto(items);
     }

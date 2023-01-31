@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -50,6 +51,10 @@ class BookingServiceImplTest {
 
     @Mock
     BookingMapper bookingMapper;
+
+    private final Pageable defaultPageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "end"));
+    private Integer from = 0;
+    private Integer size = 10;
 
     @Test
     void create_whenAllParamsAreValid_thenReturnedCorrectObjectAndInvokedSaveInDb() {
@@ -330,14 +335,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByBooker_whenStateIsAllAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByBooker_whenStateIsAllAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.ALL;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByBookerId(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByBookerId(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByBooker(state, userId, from, size);
@@ -346,14 +349,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByBooker_whenStateIsCurrentAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByBooker_whenStateIsCurrentAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.CURRENT;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByBookerIdAndCurrentState(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByBookerIdAndCurrentState(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByBooker(state, userId, from, size);
@@ -362,14 +363,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByBooker_whenStateIsPastAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByBooker_whenStateIsPastAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.PAST;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByBookerIdAndPastState(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByBookerIdAndPastState(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByBooker(state, userId, from, size);
@@ -378,14 +377,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByBooker_whenStateIsFutureAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByBooker_whenStateIsFutureAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.FUTURE;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByBookerIdAndFutureState(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByBookerIdAndFutureState(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByBooker(state, userId, from, size);
@@ -394,14 +391,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByBooker_whenStateIsWaitingAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByBooker_whenStateIsWaitingAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.WAITING;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByBookerIdAndWaitingOrRejectedState(userId, Status.WAITING, Pageable.unpaged()))
+        when(bookingRepository.findAllByBookerIdAndWaitingOrRejectedState(userId, Status.WAITING, defaultPageable))
                 .thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
@@ -411,14 +406,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByBooker_whenStateIsRejectedAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByBooker_whenStateIsRejectedAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.REJECTED;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByBookerIdAndWaitingOrRejectedState(userId, Status.REJECTED, Pageable.unpaged()))
+        when(bookingRepository.findAllByBookerIdAndWaitingOrRejectedState(userId, Status.REJECTED, defaultPageable))
                 .thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
@@ -433,7 +426,7 @@ class BookingServiceImplTest {
         long userId = 1L;
         Integer from = 1;
         Integer size = 3;
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.Direction.DESC, "end");
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerId(userId, pageable)).thenReturn(Page.empty());
@@ -458,14 +451,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByOwner_whenStateIsAllAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByOwner_whenStateIsAllAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.ALL;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByOwnerId(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByOwnerId(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByOwner(state, userId, from, size);
@@ -474,14 +465,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByOwner_whenStateIsCurrentAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByOwner_whenStateIsCurrentAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.CURRENT;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByOwnerIdAndCurrentState(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByOwnerIdAndCurrentState(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByOwner(state, userId, from, size);
@@ -490,14 +479,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByOwner_whenStateIsPastAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByOwner_whenStateIsPastAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.PAST;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByOwnerIdAndPastState(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByOwnerIdAndPastState(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByOwner(state, userId, from, size);
@@ -506,14 +493,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByOwner_whenStateIsFutureAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByOwner_whenStateIsFutureAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.FUTURE;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByOwnerIdAndFutureState(userId, Pageable.unpaged())).thenReturn(Page.empty());
+        when(bookingRepository.findAllByOwnerIdAndFutureState(userId, defaultPageable)).thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
         List<BookingDto> actualList = bookingService.getAllByOwner(state, userId, from, size);
@@ -522,14 +507,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByOwner_whenStateIsWaitingAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByOwner_whenStateIsWaitingAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.WAITING;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByOwnerIdAndWaitingOrRejectedState(userId, Status.WAITING, Pageable.unpaged()))
+        when(bookingRepository.findAllByOwnerIdAndWaitingOrRejectedState(userId, Status.WAITING, defaultPageable))
                 .thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
@@ -539,14 +522,12 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllByOwner_whenStateIsRejectedAndPageableIsUnpaged_thenReturnedCorrectListOfObjects() {
+    void getAllByOwner_whenStateIsRejectedAndPageableIsDefault_thenReturnedCorrectListOfObjects() {
         State state = State.REJECTED;
         long userId = 1L;
-        Integer from = null;
-        Integer size = null;
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findAllByOwnerIdAndWaitingOrRejectedState(userId, Status.REJECTED, Pageable.unpaged()))
+        when(bookingRepository.findAllByOwnerIdAndWaitingOrRejectedState(userId, Status.REJECTED, defaultPageable))
                 .thenReturn(Page.empty());
 
         List<BookingDto> expectedList = Collections.emptyList();
@@ -561,7 +542,7 @@ class BookingServiceImplTest {
         long userId = 1L;
         Integer from = 1;
         Integer size = 3;
-        Pageable pageable = PageRequest.of(from / size, size);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.Direction.DESC, "end");
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByOwnerId(userId, pageable)).thenReturn(Page.empty());

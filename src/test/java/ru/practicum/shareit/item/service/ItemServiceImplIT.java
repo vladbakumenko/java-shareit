@@ -150,7 +150,7 @@ class ItemServiceImplIT {
 
     @Test
     void getAllUserItems_whenFromAndSizeAreMissing_thenReturnedAllItemsOfUser() {
-        assertEquals(itemService.getAllUserItems(user1.getId(), null, null),
+        assertEquals(itemService.getAllUserItems(user1.getId(), 0, 10),
                 List.of(itemDtoWithBookingsAndComments1, itemDtoWithBookingsAndComments2));
     }
 

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
@@ -48,6 +49,7 @@ class BookingRepositoryIT {
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH-mm");
     private LocalDateTime localDateTimeNow = LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter);
+    private Pageable defaultPageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "end"));
 
     @BeforeEach
     void addContext() {
@@ -158,19 +160,8 @@ class BookingRepositoryIT {
     }
 
     @Test
-    void findAllByBookerId_whenPageableIsUnpaged_thenReturnedCorrectListWithRightSort() {
-        List<Booking> result = bookingRepository.findAllByBookerId(booker1.getId(), Pageable.unpaged()).getContent();
-
-        List<Booking> expectedList = List.of(bookingInFutureAndWaitingAndEndIn15Days,
-                bookingInFutureAndApprovedAndEndIn7Days, bookingInCurrentAndApprovedAndEndIn5Days,
-                bookingInPastAndRejectedAndEndWas3DaysAgo, bookingInPastAndApprovedAndEndWas5DaysAgo);
-
-        assertEquals(result, expectedList);
-    }
-
-    @Test
     void findAllByBookerId_whenPageableIsSet_thenReturnedListWithCorrectSizeAndRightSort() {
-        Pageable pageable = PageRequest.of(1, 2);
+        Pageable pageable = PageRequest.of(1, 2, Sort.by(Sort.Direction.DESC, "end"));
         List<Booking> result = bookingRepository.findAllByBookerId(booker1.getId(), pageable).getContent();
 
         List<Booking> expectedList = List.of(bookingInCurrentAndApprovedAndEndIn5Days,
@@ -181,7 +172,7 @@ class BookingRepositoryIT {
 
     @Test
     void findAllByBookerIdAndCurrentState() {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndCurrentState(booker1.getId(), Pageable.unpaged())
+        List<Booking> result = bookingRepository.findAllByBookerIdAndCurrentState(booker1.getId(), defaultPageable)
                 .getContent();
         List<Booking> expectedList = List.of(bookingInCurrentAndApprovedAndEndIn5Days);
 
@@ -190,7 +181,7 @@ class BookingRepositoryIT {
 
     @Test
     void findAllByBookerIdAndPastState() {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndPastState(booker1.getId(), Pageable.unpaged())
+        List<Booking> result = bookingRepository.findAllByBookerIdAndPastState(booker1.getId(), defaultPageable)
                 .getContent();
         List<Booking> expectedList = List.of(bookingInPastAndRejectedAndEndWas3DaysAgo,
                 bookingInPastAndApprovedAndEndWas5DaysAgo);
@@ -200,7 +191,7 @@ class BookingRepositoryIT {
 
     @Test
     void findAllByBookerIdAndFutureState() {
-        List<Booking> result = bookingRepository.findAllByBookerIdAndFutureState(booker1.getId(), Pageable.unpaged())
+        List<Booking> result = bookingRepository.findAllByBookerIdAndFutureState(booker1.getId(), defaultPageable)
                 .getContent();
         List<Booking> expectedList = List.of(bookingInFutureAndWaitingAndEndIn15Days,
                 bookingInFutureAndApprovedAndEndIn7Days);
@@ -211,27 +202,15 @@ class BookingRepositoryIT {
     @Test
     void findAllByBookerIdAndWaitingOrRejectedState_whenStatusIsRejected_thenReturnedCorrectList() {
         List<Booking> result = bookingRepository.findAllByBookerIdAndWaitingOrRejectedState(booker1.getId(),
-                        Status.REJECTED, Pageable.unpaged()).getContent();
+                Status.REJECTED, defaultPageable).getContent();
         List<Booking> expectedList = List.of(bookingInPastAndRejectedAndEndWas3DaysAgo);
 
         assertEquals(result, expectedList);
     }
 
     @Test
-    void findAllByOwnerId_whenPageableIsUnpaged_thenReturnedCorrectListWitRightSort() {
-        List<Booking> result = bookingRepository.findAllByOwnerId(owner.getId(), Pageable.unpaged()).getContent();
-
-        List<Booking> expectedList = List.of(bookingInFutureAndWaitingAndEndIn15Days,
-                bookingFromBooker2InFutureAndStatusIsWaitingAndEndIn10Days, bookingInFutureAndApprovedAndEndIn7Days,
-                bookingInCurrentAndApprovedAndEndIn5Days, bookingInPastAndRejectedAndEndWas3DaysAgo,
-                bookingInPastAndApprovedAndEndWas5DaysAgo);
-
-        assertEquals(result, expectedList);
-    }
-
-    @Test
     void findAllByOwnerId_whenPageableIsSet_thenReturnedCorrectListWithCorrectSizeAndRightSort() {
-        Pageable pageable = PageRequest.of(0, 3);
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "end"));
         List<Booking> result = bookingRepository.findAllByOwnerId(owner.getId(), pageable).getContent();
 
         List<Booking> expectedList = List.of(bookingInFutureAndWaitingAndEndIn15Days,
@@ -242,7 +221,7 @@ class BookingRepositoryIT {
 
     @Test
     void findAllByOwnerIdAndCurrentState() {
-        List<Booking> result = bookingRepository.findAllByOwnerIdAndCurrentState(owner.getId(), Pageable.unpaged())
+        List<Booking> result = bookingRepository.findAllByOwnerIdAndCurrentState(owner.getId(), defaultPageable)
                 .getContent();
         List<Booking> expectedList = List.of(bookingInCurrentAndApprovedAndEndIn5Days);
 
@@ -251,7 +230,7 @@ class BookingRepositoryIT {
 
     @Test
     void findAllByOwnerIdAndPastState() {
-        List<Booking> result = bookingRepository.findAllByOwnerIdAndPastState(owner.getId(), Pageable.unpaged())
+        List<Booking> result = bookingRepository.findAllByOwnerIdAndPastState(owner.getId(), defaultPageable)
                 .getContent();
         List<Booking> expectedList = List.of(bookingInPastAndRejectedAndEndWas3DaysAgo,
                 bookingInPastAndApprovedAndEndWas5DaysAgo);
@@ -261,7 +240,7 @@ class BookingRepositoryIT {
 
     @Test
     void findAllByOwnerIdAndFutureState() {
-        List<Booking> result = bookingRepository.findAllByOwnerIdAndFutureState(owner.getId(), Pageable.unpaged())
+        List<Booking> result = bookingRepository.findAllByOwnerIdAndFutureState(owner.getId(), defaultPageable)
                 .getContent();
         List<Booking> expectedList = List.of(bookingInFutureAndWaitingAndEndIn15Days,
                 bookingFromBooker2InFutureAndStatusIsWaitingAndEndIn10Days, bookingInFutureAndApprovedAndEndIn7Days);
@@ -272,7 +251,7 @@ class BookingRepositoryIT {
     @Test
     void findAllByOwnerIdAndWaitingOrRejectedState_whenStatusIsWaiting_thenReturnedCorrectList() {
         List<Booking> result = bookingRepository.findAllByOwnerIdAndWaitingOrRejectedState(owner.getId(),
-                        Status.WAITING, Pageable.unpaged()).getContent();
+                Status.WAITING, defaultPageable).getContent();
         List<Booking> expectedList = List.of(bookingInFutureAndWaitingAndEndIn15Days,
                 bookingFromBooker2InFutureAndStatusIsWaitingAndEndIn10Days);
 

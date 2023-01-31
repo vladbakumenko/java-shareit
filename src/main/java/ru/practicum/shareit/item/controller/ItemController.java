@@ -44,16 +44,16 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoWithBookingsAndComments> getAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                                @RequestParam(required = false) @PositiveOrZero Integer from,
-                                                                @RequestParam(required = false) @Positive Integer size) {
+                                                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                                @RequestParam(defaultValue = "10") @Positive Integer size) {
         return itemService.getAllUserItems(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestHeader("X-Sharer-User-Id") long userId,
                                 @RequestParam String text,
-                                @RequestParam(required = false) @PositiveOrZero Integer from,
-                                @RequestParam(required = false) @Positive Integer size) {
+                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                @RequestParam(defaultValue = "10") @Positive Integer size) {
         if (text.isBlank()) {
             return Collections.emptyList();
         }

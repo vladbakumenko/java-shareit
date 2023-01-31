@@ -20,8 +20,8 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Validated
 @Transactional(readOnly = true)
@@ -53,35 +53,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAllByOwner(long userId) {
         userService.getById(userId);
 
-        List<ItemRequestDto> itemRequests = itemRequestMapper.toListOfItemRequestDto(itemRequestRepository
+        List<ItemRequestDto> result = itemRequestMapper.toListOfItemRequestDto(itemRequestRepository
                 .findAllByRequestor(userId, Sort.by(Sort.Direction.DESC, "created")));
 
-        for (ItemRequestDto itemRequestDto : itemRequests) {
-            List<ItemDto> items = itemMapper.toListOfItemDto(itemRepository.findAllByRequest(itemRequestDto.getId()));
-            itemRequestDto.setItems(items);
-        }
-
-        return itemRequests;
+        return addItemsToRequests(result);
     }
 
     @Override
     public List<ItemRequestDto> getAll(long userId, Integer from, Integer size) {
         userService.getById(userId);
-        List<ItemRequestDto> result = Collections.emptyList();
 
-        if (from != null && size != null) {
-            Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created"));
-            result = itemRequestMapper.toListOfItemRequestDto(itemRequestRepository
-                    .findAllByRequestorNot(userId, pageable).getContent());
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created"));
+        List<ItemRequestDto> result = itemRequestMapper.toListOfItemRequestDto(itemRequestRepository
+                .findAllByRequestorNot(userId, pageable).getContent());
 
-            for (ItemRequestDto itemRequestDto : result) {
-                List<ItemDto> items = itemMapper.toListOfItemDto(itemRepository
-                        .findAllByRequest(itemRequestDto.getId()));
-                itemRequestDto.setItems(items);
-            }
-        }
-
-        return result;
+        return addItemsToRequests(result);
     }
 
     @Override
@@ -91,7 +77,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException(String.format("item request with id: %d does not exist yet",
                         requestId)));
-        List<ItemDto> items = itemMapper.toListOfItemDto(itemRepository.findAllByRequest(requestId));
+
+        List<Long> requestsId = List.of(itemRequest.getId());
+
+        List<ItemDto> items = itemMapper.toListOfItemDto(itemRepository.findAllByRequestIn(requestsId));
 
         ItemRequestDto itemRequestDto = itemRequestMapper.toItemRequestDto(itemRequest);
         itemRequestDto.setItems(items);
@@ -99,4 +88,26 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDto;
     }
 
+    private List<ItemRequestDto> addItemsToRequests(List<ItemRequestDto> result) {
+        List<Long> requestsId = result.stream()
+                .map(ItemRequestDto::getId)
+                .collect(Collectors.toList());
+
+        List<ItemDto> items = itemMapper.toListOfItemDto(itemRepository
+                .findAllByRequestIn(requestsId));
+
+        Map<Long, List<ItemDto>> map = new HashMap<>();
+
+        for (ItemDto itemDto : items) {
+            List<ItemDto> list = map.getOrDefault(itemDto.getRequestId(), new ArrayList<>());
+            list.add(itemDto);
+            map.put(itemDto.getRequestId(), list);
+        }
+
+        for (ItemRequestDto itemRequestDto : result) {
+            itemRequestDto.setItems(map.getOrDefault(itemRequestDto.getId(), Collections.emptyList()));
+        }
+
+        return result;
+    }
 }

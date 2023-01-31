@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -98,11 +99,10 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException(String.format("user with id: %d does not exist yet", userId));
         }
 
-        if (from == null && size == null) {
-            return getAllByBookerAndStateWithPaginationTerms(state, userId, Pageable.unpaged());
-        } else {
-            return getAllByBookerAndStateWithPaginationTerms(state, userId, PageRequest.of(from / size, size));
-        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "end");
+        Pageable pageable = PageRequest.of(from / size, size, sort);
+
+        return getAllByBookerAndStateWithPaginationTerms(state, userId, pageable);
     }
 
     @Override
@@ -111,11 +111,11 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException(String.format("user with id: %d does not exist yet", userId));
         }
 
-        if (from == null && size == null) {
-            return getAllByOwnerAndStateWithPaginationTerms(state, userId, Pageable.unpaged());
-        } else {
-            return getAllByOwnerAndStateWithPaginationTerms(state, userId, PageRequest.of(from / size, size));
-        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "end");
+        Pageable pageable = PageRequest.of(from / size, size, sort);
+
+        return getAllByOwnerAndStateWithPaginationTerms(state, userId, pageable);
+
     }
 
     private List<BookingDto> getAllByBookerAndStateWithPaginationTerms(State state, long userId, Pageable pageable) {

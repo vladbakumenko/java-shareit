@@ -114,7 +114,7 @@ class ItemRepositoryIT {
 
     @Test
     void findAllByRequest() {
-        List<Item> result = itemRepository.findAllByRequest(itemRequest.getId());
+        List<Item> result = itemRepository.findAllByRequestIn(List.of(itemRequest.getId()));
 
         assertEquals(result, List.of(item4));
     }

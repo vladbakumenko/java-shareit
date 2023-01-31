@@ -145,7 +145,7 @@ class ItemControllerIT {
                         .header(header, userId))
                 .andExpect(status().isOk());
 
-        verify(itemService).getAllUserItems(userId, null, null);
+        verify(itemService).getAllUserItems(userId, 0, 10);
     }
 
     @SneakyThrows
@@ -175,7 +175,7 @@ class ItemControllerIT {
                         .param("text", text))
                 .andExpect(status().isOk());
 
-        verify(itemService).search(userId, text, null, null);
+        verify(itemService).search(userId, text, 0, 10);
     }
 
     @SneakyThrows

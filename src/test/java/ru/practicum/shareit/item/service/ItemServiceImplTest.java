@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -109,21 +108,6 @@ class ItemServiceImplTest {
                 () -> itemService.update(itemId, userId, itemDto));
 
         assertEquals(exception.getMessage(), "item with id: 1 does not belong to the user with id: 2");
-    }
-
-    @Test
-    void search_whenFromAndSizeAreMissing_thenReturnedUnPageableListOfItems() {
-        long userId = 1L;
-        String text = "text";
-        List<Item> items = List.of(new Item());
-        Page<Item> itemsPage = new PageImpl<>(items);
-
-        when(itemRepository.search(text, Pageable.unpaged())).thenReturn(itemsPage);
-
-        List<ItemDto> expectedList = itemMapper.toListOfItemDto(itemsPage.getContent());
-        List<ItemDto> actualList = itemService.search(userId, text, null, null);
-
-        assertEquals(expectedList, actualList);
     }
 
     @Test

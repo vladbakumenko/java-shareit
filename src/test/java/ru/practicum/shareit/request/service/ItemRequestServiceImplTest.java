@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,7 +82,7 @@ class ItemRequestServiceImplTest {
         List<ItemDto> itemsDto = List.of();
         List<Item> items = List.of();
 
-        when(itemRepository.findAllByRequest(anyLong())).thenReturn(items);
+        when(itemRepository.findAllByRequestIn(anyList())).thenReturn(items);
         when(itemMapper.toListOfItemDto(items)).thenReturn(itemsDto);
 
         List<ItemRequestDto> actualList = itemRequestService.getAllByOwner(userId);
@@ -105,7 +105,7 @@ class ItemRequestServiceImplTest {
         List<ItemDto> itemsDto = List.of();
         List<Item> items = List.of();
 
-        when(itemRepository.findAllByRequest(anyLong())).thenReturn(items);
+        when(itemRepository.findAllByRequestIn(anyList())).thenReturn(items);
         when(itemMapper.toListOfItemDto(items)).thenReturn(itemsDto);
 
         List<ItemRequestDto> actualList = itemRequestService.getAll(userId, from, size);
@@ -118,13 +118,13 @@ class ItemRequestServiceImplTest {
         long userId = 1L;
         long requestId = 1L;
 
-        ItemRequest itemRequest = ItemRequest.builder().build();
+        ItemRequest itemRequest = ItemRequest.builder().id(requestId).build();
         when(itemRequestRepository.findById(requestId)).thenReturn(Optional.of(itemRequest));
 
         List<ItemDto> itemsDto = List.of();
         List<Item> items = List.of();
 
-        when(itemRepository.findAllByRequest(anyLong())).thenReturn(items);
+        when(itemRepository.findAllByRequestIn(anyList())).thenReturn(items);
         when(itemMapper.toListOfItemDto(items)).thenReturn(itemsDto);
 
         ItemRequestDto expectedItemRequestDto = ItemRequestDto.builder().build();
