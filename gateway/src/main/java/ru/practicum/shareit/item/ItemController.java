@@ -2,17 +2,23 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping(path = "/items")
 @RequiredArgsConstructor
 @Slf4j
@@ -58,6 +64,9 @@ public class ItemController {
                                          @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Get items with name or description which contain text: {}, userId = {}, from = {}, size = {}",
                 text, userId, from, size);
+        if (text.isBlank()) {
+            return new ResponseEntity<>(Collections.EMPTY_LIST, HttpStatus.OK);
+        }
         return itemClient.search(userId, text, from, size);
     }
 
