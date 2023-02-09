@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.request.dto.ItemRequestCreationDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -16,9 +15,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ItemRequestController.class)
@@ -57,25 +56,6 @@ class ItemRequestControllerTest {
                 .getContentAsString();
 
         assertEquals(result, objectMapper.writeValueAsString(itemRequestDto));
-    }
-
-    @SneakyThrows
-    @Test
-    void add_whenItemRequestCreationDtoIsNotValid_thenReturnedStatsIsBadRequestAndServiceNotInvoked() {
-        long userId = 1L;
-        ItemRequestCreationDto itemRequestCreationDto = new ItemRequestCreationDto();
-
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder().build();
-
-        when(itemRequestService.add(userId, itemRequestCreationDto)).thenReturn(itemRequestDto);
-
-        ResultActions resultActions = mockMvc.perform(post("/requests")
-                        .header(header, userId)
-                        .contentType(contentType)
-                        .content(objectMapper.writeValueAsString(itemRequestCreationDto)))
-                .andExpect(status().isBadRequest());
-
-        verify(itemRequestService, never()).add(userId, itemRequestCreationDto);
     }
 
     @SneakyThrows

@@ -62,27 +62,6 @@ class BookingControllerIT {
 
     @SneakyThrows
     @Test
-    void create_whenBookingCreationDtoIsNotValid_thenReturnedBadRequest() {
-        long userId = 1L;
-
-        //end before start
-        BookingCreationDto bookingCreationDto = BookingCreationDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().plusDays(10))
-                .end(LocalDateTime.now().plusDays(1))
-                .build();
-
-        mockMvc.perform(post("/bookings")
-                        .header(header, userId)
-                        .contentType(contentType)
-                        .content(objectMapper.writeValueAsString(bookingCreationDto)))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, never()).create(userId, bookingCreationDto);
-    }
-
-    @SneakyThrows
-    @Test
     void approve() {
         long bookingId = 1L;
         boolean approved = true;
@@ -163,24 +142,6 @@ class BookingControllerIT {
                 .getContentAsString();
 
         assertEquals(result, objectMapper.writeValueAsString(list));
-    }
-
-    @SneakyThrows
-    @Test
-    void getAllByBooker_whenStateIsNotValid_thenReturnedBadRequest() {
-        long userId = 1L;
-        int from = 1;
-        int size = 10;
-        String state = "notValid";
-
-        mockMvc.perform(get("/bookings")
-                        .header(header, userId)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size))
-                        .param("state", state))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, never()).getAllByBooker(State.ALL, userId, from, size);
     }
 
     @SneakyThrows

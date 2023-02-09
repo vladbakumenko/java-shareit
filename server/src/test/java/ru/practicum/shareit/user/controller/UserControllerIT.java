@@ -15,10 +15,9 @@ import ru.practicum.shareit.user.service.UserService;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureTestDatabase
@@ -52,22 +51,6 @@ class UserControllerIT {
         verify(userService).save(userDto);
     }
 
-//    @SneakyThrows
-//    @Test
-//    void save_whenUserDtoNotValid_thenReturnedBadRequestAndServiceNotInvoked() {
-//        UserDto userDto = UserDto.builder()
-//                .name("")
-//                .email("email@email.ru")
-//                .build();
-//
-//        mockMvc.perform(post("/users")
-//                        .contentType(contentType)
-//                        .content(objectMapper.writeValueAsString(userDto)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(userService, never()).save(userDto);
-//    }
-
     @SneakyThrows
     @Test
     void update_whenUserDtoIsValid_thenReturnedStatusIsOkAndCorrectResponse() {
@@ -90,21 +73,6 @@ class UserControllerIT {
 
         assertEquals(result, objectMapper.writeValueAsString(userDto));
     }
-
-//    @SneakyThrows
-//    @Test
-//    void update_whenUserDtoNotValid_thenReturnedBadRequest() {
-//        long userId = 1L;
-//        UserDto userDto = UserDto.builder()
-//                .name("")
-//                .email("email.ru")
-//                .build();
-//
-//        mockMvc.perform(patch("/users/{id}", userId)
-//                        .contentType(contentType)
-//                        .content(objectMapper.writeValueAsString(userDto)))
-//                .andExpect(status().isBadRequest());
-//    }
 
     @SneakyThrows
     @Test

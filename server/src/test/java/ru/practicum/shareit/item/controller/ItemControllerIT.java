@@ -62,25 +62,6 @@ class ItemControllerIT {
 
     @SneakyThrows
     @Test
-    void save_whenItemDtoIsNotValid_thenReturnedStatusBadRequest() {
-        long userId = 1L;
-        ItemDto itemDto = ItemDto.builder()
-                .name("")
-                .description("desc")
-                .available(true)
-                .build();
-
-        mockMvc.perform(post("/items")
-                        .header(header, userId)
-                        .contentType(contentType)
-                        .content(objectMapper.writeValueAsString(itemDto)))
-                .andExpect(status().isBadRequest());
-
-        verify(itemService, never()).save(userId, itemDto);
-    }
-
-    @SneakyThrows
-    @Test
     void update_whenItemIdAndUserIdAreValid_thenReturnedStatusIsOkAndCorrectResponse() {
         long itemId = 1L;
         long userId = 1L;
@@ -126,18 +107,6 @@ class ItemControllerIT {
 
     @SneakyThrows
     @Test
-    void getItemById_whenItemIdIsNotValid_thenReturnedStatusBadRequest() {
-        long itemId = 0L;
-        long userId = 1L;
-
-        mockMvc.perform(get("/items/{itemId}", itemId).header(header, userId))
-                .andExpect(status().isBadRequest());
-
-        verify(itemService, never()).getById(itemId, userId);
-    }
-
-    @SneakyThrows
-    @Test
     void getAllUserItems_whenParamsAreMissing_thenReturnedStatusIsOk() {
         long userId = 1L;
 
@@ -146,22 +115,6 @@ class ItemControllerIT {
                 .andExpect(status().isOk());
 
         verify(itemService).getAllUserItems(userId, 0, 10);
-    }
-
-    @SneakyThrows
-    @Test
-    void getAllUserItems_whenParamsAreNotValid_thenReturnedBadRequest() {
-        long userId = 1L;
-        int from = -1;
-        int size = 10;
-
-        mockMvc.perform(get("/items")
-                        .header(header, userId)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isBadRequest());
-
-        verify(itemService, never()).getAllUserItems(userId, from, size);
     }
 
     @SneakyThrows
